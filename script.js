@@ -1,4 +1,5 @@
 const body = document.body;
+const preloader = document.querySelector("[data-preloader]");
 const modeToggle = document.querySelector("[data-mode-toggle]");
 const menuToggle = document.querySelector("[data-menu-toggle]");
 const mobileMenu = document.querySelector("[data-mobile-menu]");
@@ -19,9 +20,21 @@ const cursorDot = document.querySelector("[data-cursor-dot]");
 const cursorRing = document.querySelector("[data-cursor-ring]");
 const magneticItems = document.querySelectorAll(".magnetic, button, .browser-card, .quote-options button, summary");
 const tabButtons = document.querySelectorAll(".tab-rail button");
+const sectionLabel = document.querySelector("[data-section-label]");
+const scrollProgress = document.querySelector("[data-scroll-progress]");
+const namedSections = [...document.querySelectorAll("[data-section-name]")];
 
 let quoteStep = 0;
 const quoteSelections = {};
+
+body.classList.add("is-loading");
+
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    preloader.classList.add("is-done");
+    body.classList.remove("is-loading");
+  }, 650);
+});
 
 const setQuoteStep = (index) => {
   quoteStep = Math.max(0, Math.min(index, quoteSteps.length - 1));
@@ -117,6 +130,27 @@ const updateStickyCards = () => {
   const progress = Math.min(Math.max(-rect.top / scrollable, 0), 0.999);
   const index = Math.floor(progress * stickyCards.length);
   stickyCards.forEach((card, cardIndex) => card.classList.toggle("active", cardIndex === index));
+};
+
+const updateScrollStatus = () => {
+  const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = documentHeight > 0 ? (window.scrollY / documentHeight) * 100 : 0;
+  scrollProgress.style.setProperty("--scroll-progress", `${progress}%`);
+
+  let current = namedSections[0]?.dataset.sectionName || "Home";
+  namedSections.forEach((section) => {
+    const rect = section.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.42 && rect.bottom > window.innerHeight * 0.28) {
+      current = section.dataset.sectionName;
+    }
+  });
+  sectionLabel.textContent = current;
+
+  if (networkCanvas) {
+    const heroProgress = Math.min(Math.max(window.scrollY / window.innerHeight, 0), 1);
+    networkCanvas.style.setProperty("--network-shift", `${heroProgress * -18}px`);
+    networkCanvas.style.setProperty("--network-scale", `${1 - heroProgress * 0.035}`);
+  }
 };
 
 const setupCursor = () => {
@@ -300,6 +334,17 @@ const createNetwork = (canvas) => {
 };
 
 createNetwork(networkCanvas);
-window.addEventListener("scroll", updateStickyCards, { passive: true });
-window.addEventListener("resize", updateStickyCards);
+window.addEventListener(
+  "scroll",
+  () => {
+    updateStickyCards();
+    updateScrollStatus();
+  },
+  { passive: true },
+);
+window.addEventListener("resize", () => {
+  updateStickyCards();
+  updateScrollStatus();
+});
 updateStickyCards();
+updateScrollStatus();

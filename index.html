@@ -17,8 +17,19 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="preloader" data-preloader aria-hidden="true">
+      <div class="preloader-mark">
+        <span class="brand-mark"></span>
+        <strong>BrandIdentity</strong>
+      </div>
+      <div class="preloader-line"><span></span></div>
+    </div>
     <div class="cursor-dot" data-cursor-dot aria-hidden="true"></div>
     <div class="cursor-ring" data-cursor-ring aria-hidden="true"></div>
+    <aside class="scroll-status" aria-label="Scroll progress">
+      <span data-section-label>Home</span>
+      <i><b data-scroll-progress></b></i>
+    </aside>
     <header class="site-header" data-nav>
       <a class="brand magnetic" href="#top" aria-label="BrandIdentity home">
         <span class="brand-mark" aria-hidden="true"></span>
@@ -51,7 +62,7 @@
     </nav>
 
     <main id="top">
-      <section class="hero" aria-label="BrandIdentity introduction">
+      <section class="hero" aria-label="BrandIdentity introduction" data-section-name="Home">
         <canvas class="hero-network" data-network aria-hidden="true"></canvas>
         <div class="hero-copy">
           <p class="micro">Brand strategy and identity agency.</p>
@@ -141,7 +152,7 @@
         </form>
       </section>
 
-      <section class="sticky-services" id="services" data-animate>
+      <section class="sticky-services" id="services" data-animate data-section-name="Services">
         <div class="sticky-copy">
           <p class="micro">Services</p>
           <h2>Three layers that make a brand feel inevitable.</h2>
@@ -165,7 +176,7 @@
         </div>
       </section>
 
-      <section class="pillars section-space" data-animate>
+      <section class="pillars section-space" data-animate data-section-name="Method">
         <div class="orbit-row" aria-hidden="true">
           <span></span>
           <span></span>
@@ -187,14 +198,14 @@
         </div>
       </section>
 
-      <section class="statement section-space" id="about" data-animate>
+      <section class="statement section-space" id="about" data-animate data-section-name="About">
         <h2>
           As brand builders across strategy, design, and digital systems, we partner with founders to simplify,
           sharpen, and scale their market presence.
         </h2>
       </section>
 
-      <section class="featured-work section-space" id="work" data-animate>
+      <section class="featured-work section-space" id="work" data-animate data-section-name="Work">
         <div class="work-visual">
           <div class="browser-card">
             <div class="browser-top">
@@ -223,7 +234,7 @@
         </div>
       </section>
 
-      <section class="knowledge section-space" id="knowledge" data-animate>
+      <section class="knowledge section-space" id="knowledge" data-animate data-section-name="Knowledge">
         <div class="tab-rail">
           <button class="active" type="button">Brand Strategy</button>
           <button type="button">Identity Design</button>
@@ -252,7 +263,7 @@
         </div>
       </section>
 
-      <section class="contact section-space" id="contact" data-animate>
+      <section class="contact section-space" id="contact" data-animate data-section-name="Contact">
         <p class="micro">Start a project</p>
         <h2>Ready to build a brand people recognize before you explain it?</h2>
         <a class="large-cta" href="mailto:hello@brandidentity.studio">hello@brandidentity.studio</a>
