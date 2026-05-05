@@ -1,22 +1,92 @@
 const body = document.body;
 const modeToggle = document.querySelector("[data-mode-toggle]");
+const menuToggle = document.querySelector("[data-menu-toggle]");
+const mobileMenu = document.querySelector("[data-mobile-menu]");
 const quotePanel = document.querySelector("[data-quote-panel]");
 const quoteOpen = document.querySelector("[data-quote-open]");
 const quoteClose = document.querySelector("[data-quote-close]");
+const quoteFlow = document.querySelector("[data-quote-flow]");
+const quoteSteps = [...document.querySelectorAll(".quote-step")];
+const quoteProgress = [...document.querySelectorAll(".quote-progress span")];
+const quoteBack = document.querySelector("[data-quote-back]");
+const quoteNext = document.querySelector("[data-quote-next]");
+const quoteSuccess = document.querySelector("[data-quote-success]");
 const networkCanvas = document.querySelector("[data-network]");
 const animatedItems = document.querySelectorAll("[data-animate]");
+const stickySection = document.querySelector(".sticky-services");
+const stickyCards = [...document.querySelectorAll(".sticky-card")];
+const cursorDot = document.querySelector("[data-cursor-dot]");
+const cursorRing = document.querySelector("[data-cursor-ring]");
+const magneticItems = document.querySelectorAll(".magnetic, button, .browser-card, .quote-options button, summary");
+const tabButtons = document.querySelectorAll(".tab-rail button");
+
+let quoteStep = 0;
+const quoteSelections = {};
+
+const setQuoteStep = (index) => {
+  quoteStep = Math.max(0, Math.min(index, quoteSteps.length - 1));
+  quoteSteps.forEach((step, stepIndex) => step.classList.toggle("active", stepIndex === quoteStep));
+  quoteProgress.forEach((item, itemIndex) => item.classList.toggle("active", itemIndex <= quoteStep));
+  quoteBack.disabled = quoteStep === 0;
+  quoteNext.textContent = quoteStep === quoteSteps.length - 1 ? "Submit request" : "Continue ->";
+};
 
 modeToggle.addEventListener("click", () => {
   body.classList.toggle("dark-mode");
 });
 
+menuToggle.addEventListener("click", () => {
+  const isOpen = mobileMenu.classList.toggle("is-open");
+  menuToggle.classList.toggle("is-open", isOpen);
+  body.style.overflow = isOpen ? "hidden" : "";
+});
+
+mobileMenu.querySelectorAll("a").forEach((link) => {
+  link.addEventListener("click", () => {
+    mobileMenu.classList.remove("is-open");
+    menuToggle.classList.remove("is-open");
+    body.style.overflow = "";
+  });
+});
+
 quoteOpen.addEventListener("click", () => {
   quotePanel.classList.add("is-open");
+  setQuoteStep(0);
 });
 
 quoteClose.addEventListener("click", () => {
   quotePanel.classList.remove("is-open");
 });
+
+document.querySelectorAll("[data-choice]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const key = button.dataset.choice;
+    quoteSelections[key] = button.textContent.trim();
+    document.querySelectorAll(`[data-choice="${key}"]`).forEach((item) => item.classList.remove("selected"));
+    button.classList.add("selected");
+    setTimeout(() => setQuoteStep(quoteStep + 1), 160);
+  });
+});
+
+quoteBack.addEventListener("click", () => setQuoteStep(quoteStep - 1));
+
+quoteNext.addEventListener("click", () => {
+  if (quoteStep < quoteSteps.length - 1) {
+    setQuoteStep(quoteStep + 1);
+    return;
+  }
+
+  quoteFlow.classList.add("is-complete");
+  quoteSuccess.textContent = `Done. Your ${quoteSelections.service || "BrandIdentity"} request is ready.`;
+  quoteNext.textContent = "Submitted";
+  setTimeout(() => {
+    quotePanel.classList.remove("is-open");
+    quoteFlow.classList.remove("is-complete");
+    setQuoteStep(0);
+  }, 1800);
+});
+
+setQuoteStep(0);
 
 if ("IntersectionObserver" in window) {
   const revealObserver = new IntersectionObserver(
@@ -33,13 +103,97 @@ if ("IntersectionObserver" in window) {
   animatedItems.forEach((item) => item.classList.add("is-visible"));
 }
 
+tabButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    tabButtons.forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+  });
+});
+
+const updateStickyCards = () => {
+  if (!stickySection || window.innerWidth <= 900) return;
+  const rect = stickySection.getBoundingClientRect();
+  const scrollable = rect.height - window.innerHeight;
+  const progress = Math.min(Math.max(-rect.top / scrollable, 0), 0.999);
+  const index = Math.floor(progress * stickyCards.length);
+  stickyCards.forEach((card, cardIndex) => card.classList.toggle("active", cardIndex === index));
+};
+
+const setupCursor = () => {
+  if (window.matchMedia("(pointer: coarse)").matches) return;
+
+  let dotX = 0;
+  let dotY = 0;
+  let ringX = 0;
+  let ringY = 0;
+
+  window.addEventListener("pointermove", (event) => {
+    body.classList.add("cursor-ready");
+    dotX = event.clientX;
+    dotY = event.clientY;
+    cursorDot.style.transform = `translate3d(${dotX}px, ${dotY}px, 0) translate(-50%, -50%)`;
+  });
+
+  const render = () => {
+    ringX += (dotX - ringX) * 0.18;
+    ringY += (dotY - ringY) * 0.18;
+    cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
+    requestAnimationFrame(render);
+  };
+
+  magneticItems.forEach((item) => {
+    item.addEventListener("pointerenter", () => body.classList.add("cursor-hover"));
+    item.addEventListener("pointerleave", () => {
+      body.classList.remove("cursor-hover");
+      item.style.transform = "";
+    });
+    item.addEventListener("pointermove", (event) => {
+      if (!item.classList.contains("magnetic")) return;
+      const rect = item.getBoundingClientRect();
+      const x = (event.clientX - rect.left - rect.width / 2) * 0.16;
+      const y = (event.clientY - rect.top - rect.height / 2) * 0.16;
+      item.style.transform = `translate(${x}px, ${y}px)`;
+    });
+  });
+
+  render();
+};
+
+setupCursor();
+
 const createNetwork = (canvas) => {
   const context = canvas.getContext("2d");
-  const colors = ["#ff4f5a", "#9d37f2", "#5358ff", "#050505"];
   let width = 0;
   let height = 0;
   let points = [];
-  let mouse = { x: 0.5, y: 0.5 };
+  let mouse = { x: 0.5, y: 0.5, active: false };
+
+  const palette = () =>
+    body.classList.contains("dark-mode")
+      ? ["#ff5f83", "#b56cff", "#7f83ff", "#ffffff"]
+      : ["#ff4f5a", "#9d37f2", "#5358ff", "#050505"];
+
+  const brainPoint = (index, count) => {
+    const t = (index / count) * Math.PI * 2;
+    const outline = index < count * 0.62;
+    const side = index % 2 === 0 ? -1 : 1;
+    const lobeCenter = side === -1 ? 0.42 : 0.58;
+
+    if (outline) {
+      const lobe = Math.sin(t * 3) * 0.08 + 1;
+      return {
+        x: lobeCenter + Math.cos(t) * 0.18 * lobe,
+        y: 0.5 + Math.sin(t) * 0.29 * (0.92 + Math.cos(t * 2) * 0.06),
+      };
+    }
+
+    const spiral = (index / count) * Math.PI * 9;
+    const radius = 0.04 + ((index % 14) / 14) * 0.16;
+    return {
+      x: 0.5 + Math.cos(spiral) * radius + Math.sin(spiral * 0.5) * 0.03,
+      y: 0.5 + Math.sin(spiral) * radius * 1.25,
+    };
+  };
 
   const resize = () => {
     const ratio = window.devicePixelRatio || 1;
@@ -49,38 +203,46 @@ const createNetwork = (canvas) => {
     canvas.width = Math.floor(width * ratio);
     canvas.height = Math.floor(height * ratio);
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
-    const count = width < 520 ? 38 : 48;
+    const count = width < 520 ? 46 : 60;
+    const colors = palette();
+
     points = Array.from({ length: count }, (_, index) => {
-      const ring = index / count;
-      const angle = ring * Math.PI * 7.2;
-      const radius = Math.min(width, height) * (0.12 + ring * 0.34);
+      const point = brainPoint(index, count);
+      const jitter = width < 520 ? 0.035 : 0.028;
       return {
-        x: width * 0.5 + Math.cos(angle) * radius + (Math.random() - 0.5) * 38,
-        y: height * 0.5 + Math.sin(angle) * radius + (Math.random() - 0.5) * 38,
-        baseX: width * 0.5 + Math.cos(angle) * radius,
-        baseY: height * 0.5 + Math.sin(angle) * radius,
-        size: Math.random() * 7 + 4,
+        x: (point.x + (Math.random() - 0.5) * jitter) * width,
+        y: (point.y + (Math.random() - 0.5) * jitter) * height,
+        baseX: point.x * width,
+        baseY: point.y * height,
+        size: index % 7 === 0 ? 13 : Math.random() * 5 + 4,
         color: colors[index % colors.length],
-        speed: Math.random() * 0.7 + 0.35,
+        speed: Math.random() * 0.7 + 0.28,
       };
     });
   };
 
   const drawLines = (time) => {
+    const lineColor = body.classList.contains("dark-mode") ? "rgba(255,255,255,0.38)" : "rgba(0,0,0,0.34)";
     context.setLineDash([2, 7]);
-    context.lineWidth = 1.3;
-    context.strokeStyle = body.classList.contains("dark-mode") ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.52)";
+    context.lineWidth = 1.15;
+    context.strokeStyle = lineColor;
 
     for (let i = 0; i < points.length; i += 1) {
       for (let j = i + 1; j < points.length; j += 1) {
         const dx = points[i].x - points[j].x;
         const dy = points[i].y - points[j].y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < Math.min(width, height) * 0.22) {
-          context.globalAlpha = 1 - distance / (Math.min(width, height) * 0.22);
+        const limit = Math.min(width, height) * 0.18;
+        if (distance < limit) {
+          context.globalAlpha = (1 - distance / limit) * 0.86;
           context.beginPath();
           context.moveTo(points[i].x, points[i].y);
-          context.quadraticCurveTo(width * 0.5, height * 0.5 + Math.sin(time * 0.001) * 16, points[j].x, points[j].y);
+          context.quadraticCurveTo(
+            width * 0.5 + Math.sin(time * 0.0007) * 10,
+            height * 0.5 + Math.cos(time * 0.0008) * 10,
+            points[j].x,
+            points[j].y,
+          );
           context.stroke();
         }
       }
@@ -92,26 +254,30 @@ const createNetwork = (canvas) => {
 
   const draw = (time) => {
     context.clearRect(0, 0, width, height);
-    const cx = width * (0.5 + (mouse.x - 0.5) * 0.04);
-    const cy = height * (0.5 + (mouse.y - 0.5) * 0.04);
+    const cx = width * mouse.x;
+    const cy = height * mouse.y;
 
     points.forEach((point, index) => {
-      const orbit = time * 0.00022 * point.speed + index;
-      point.x += (point.baseX + Math.cos(orbit) * 20 - point.x + (cx - width * 0.5) * 0.08) * 0.035;
-      point.y += (point.baseY + Math.sin(orbit) * 20 - point.y + (cy - height * 0.5) * 0.08) * 0.035;
+      const orbit = time * 0.00018 * point.speed + index;
+      const dx = point.x - cx;
+      const dy = point.y - cy;
+      const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+      const attraction = mouse.active ? Math.max(0, 1 - distance / 260) : 0;
+      point.x += (point.baseX + Math.cos(orbit) * 12 - point.x - dx * attraction * 0.032) * 0.045;
+      point.y += (point.baseY + Math.sin(orbit) * 12 - point.y - dy * attraction * 0.032) * 0.045;
     });
 
     drawLines(time);
 
     points.forEach((point, index) => {
-      const pulse = Math.sin(time * 0.003 + index) * 0.35 + 1;
+      const pulse = Math.sin(time * 0.0024 + index) * 0.22 + 1;
       context.beginPath();
       context.fillStyle = point.color;
       context.arc(point.x, point.y, point.size * pulse, 0, Math.PI * 2);
       context.fill();
     });
 
-    window.requestAnimationFrame(draw);
+    requestAnimationFrame(draw);
   };
 
   canvas.addEventListener("pointermove", (event) => {
@@ -119,12 +285,21 @@ const createNetwork = (canvas) => {
     mouse = {
       x: (event.clientX - rect.left) / rect.width,
       y: (event.clientY - rect.top) / rect.height,
+      active: true,
     };
+  });
+
+  canvas.addEventListener("pointerleave", () => {
+    mouse.active = false;
   });
 
   resize();
   window.addEventListener("resize", resize);
-  window.requestAnimationFrame(draw);
+  modeToggle.addEventListener("click", () => setTimeout(resize, 20));
+  requestAnimationFrame(draw);
 };
 
 createNetwork(networkCanvas);
+window.addEventListener("scroll", updateStickyCards, { passive: true });
+window.addEventListener("resize", updateStickyCards);
+updateStickyCards();

@@ -17,27 +17,38 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="cursor-dot" data-cursor-dot aria-hidden="true"></div>
+    <div class="cursor-ring" data-cursor-ring aria-hidden="true"></div>
     <header class="site-header" data-nav>
-      <a class="brand" href="#top" aria-label="BrandIdentity home">
+      <a class="brand magnetic" href="#top" aria-label="BrandIdentity home">
         <span class="brand-mark" aria-hidden="true"></span>
         <span>BrandIdentity</span>
       </a>
       <nav class="nav-links" aria-label="Main navigation">
-        <a href="#work">Work</a>
-        <a href="#services">Services</a>
-        <a href="#clients">Clients</a>
-        <a href="#about">About</a>
-        <a href="#knowledge">Knowledge</a>
+        <a class="magnetic" href="#work">Work</a>
+        <a class="magnetic" href="#services">Services</a>
+        <a class="magnetic" href="#clients">Clients</a>
+        <a class="magnetic" href="#about">About</a>
+        <a class="magnetic" href="#knowledge">Knowledge</a>
       </nav>
-      <button class="mode-toggle" type="button" aria-label="Switch mode" data-mode-toggle>
+      <button class="mode-toggle magnetic" type="button" aria-label="Switch mode" data-mode-toggle>
         <span></span>
       </button>
-      <a class="contact-pill" href="#contact">Contact</a>
+      <a class="contact-pill magnetic" href="#contact">Contact</a>
       <button class="menu-button" type="button" aria-label="Open menu" data-menu-toggle>
         <span></span>
         <span></span>
       </button>
     </header>
+
+    <nav class="mobile-menu" aria-label="Mobile navigation" data-mobile-menu>
+      <a href="#work">Work</a>
+      <a href="#services">Services</a>
+      <a href="#clients">Clients</a>
+      <a href="#about">About</a>
+      <a href="#knowledge">Knowledge</a>
+      <a href="#contact">Contact</a>
+    </nav>
 
     <main id="top">
       <section class="hero" aria-label="BrandIdentity introduction">
@@ -52,33 +63,109 @@
           <p class="hero-subtitle">
             We turn ambitious businesses into brands people understand, remember, and trust.
           </p>
-          <button class="quote-link" type="button" data-quote-open>Design A Quote</button>
+          <button class="quote-link magnetic" type="button" data-quote-open>Design A Quote</button>
         </div>
-        <div class="client-strip" aria-label="Representative client types">
-          <span>Fintech</span>
-          <span>Healthtech</span>
-          <span>SaaS</span>
-          <span>D2C</span>
-          <span>Hospitality</span>
-          <span>Edtech</span>
-          <span>AI</span>
+        <div class="client-strip logo-marquee" aria-label="Representative client types">
+          <div class="marquee-track">
+            <span>FINTRIX</span>
+            <span>HEALIO</span>
+            <span>NOVA SAAS</span>
+            <span>D2C LABS</span>
+            <span>STAYCRAFT</span>
+            <span>EDUCORE</span>
+            <span>AIBASE</span>
+            <span>FINTRIX</span>
+            <span>HEALIO</span>
+            <span>NOVA SAAS</span>
+            <span>D2C LABS</span>
+            <span>STAYCRAFT</span>
+            <span>EDUCORE</span>
+            <span>AIBASE</span>
+          </div>
         </div>
       </section>
 
       <section class="quote-drawer" aria-label="Quote options" data-quote-panel>
         <button class="drawer-close" type="button" aria-label="Close quote panel" data-quote-close></button>
-        <p>What services would you like to opt?</p>
-        <div class="quote-options">
-          <button type="button">Brand Strategy</button>
-          <button type="button">Logo & Identity</button>
-          <button type="button">Website Design</button>
-          <button type="button">Launch Campaign</button>
-          <button type="button">All Services</button>
+        <div class="quote-progress" aria-label="Quote progress">
+          <span class="active"></span>
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
-        <a href="#contact">Continue <span>-></span></a>
+        <form class="quote-flow" data-quote-flow>
+          <div class="quote-step active" data-step="0">
+            <p>What services would you like to opt?</p>
+            <div class="quote-options">
+              <button type="button" data-choice="service">Brand Strategy</button>
+              <button type="button" data-choice="service">Logo & Identity</button>
+              <button type="button" data-choice="service">Website Design</button>
+              <button type="button" data-choice="service">Launch Campaign</button>
+              <button type="button" data-choice="service">All Services</button>
+            </div>
+          </div>
+          <div class="quote-step" data-step="1">
+            <p>What budget range feels right?</p>
+            <div class="quote-options">
+              <button type="button" data-choice="budget">Under ₹50k</button>
+              <button type="button" data-choice="budget">₹50k - ₹1.5L</button>
+              <button type="button" data-choice="budget">₹1.5L - ₹3L</button>
+              <button type="button" data-choice="budget">₹3L+</button>
+            </div>
+          </div>
+          <div class="quote-step" data-step="2">
+            <p>When do you want to launch?</p>
+            <div class="quote-options">
+              <button type="button" data-choice="timeline">This month</button>
+              <button type="button" data-choice="timeline">1-2 months</button>
+              <button type="button" data-choice="timeline">3+ months</button>
+              <button type="button" data-choice="timeline">Still exploring</button>
+            </div>
+          </div>
+          <div class="quote-step" data-step="3">
+            <p>Where should we send the plan?</p>
+            <label>
+              Name
+              <input type="text" name="name" placeholder="Your name" />
+            </label>
+            <label>
+              Email
+              <input type="email" name="email" placeholder="you@example.com" />
+            </label>
+          </div>
+          <div class="quote-actions">
+            <button type="button" data-quote-back>Back</button>
+            <button type="button" data-quote-next>Continue -></button>
+          </div>
+          <p class="quote-success" data-quote-success>Done. Your BrandIdentity quote request is ready.</p>
+        </form>
       </section>
 
-      <section class="pillars section-space" id="services" data-animate>
+      <section class="sticky-services" id="services" data-animate>
+        <div class="sticky-copy">
+          <p class="micro">Services</p>
+          <h2>Three layers that make a brand feel inevitable.</h2>
+        </div>
+        <div class="sticky-stage" data-sticky-stage>
+          <article class="sticky-card active">
+            <span>01</span>
+            <h3>Strategy</h3>
+            <p>Position the offer, audience, promise, message, and market entry point.</p>
+          </article>
+          <article class="sticky-card">
+            <span>02</span>
+            <h3>Identity</h3>
+            <p>Build the logo system, visual language, typography, and brand guidelines.</p>
+          </article>
+          <article class="sticky-card">
+            <span>03</span>
+            <h3>Growth</h3>
+            <p>Turn the identity into a launch website, pitch assets, and repeatable campaigns.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="pillars section-space" data-animate>
         <div class="orbit-row" aria-hidden="true">
           <span></span>
           <span></span>

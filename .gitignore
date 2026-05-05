@@ -1,3 +1,5 @@
 *-preview.png
 desktop-full-preview.png
 mobile-full-preview.png
+*.png
+!assets/*.png
