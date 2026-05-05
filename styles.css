@@ -9,6 +9,7 @@
   --gold: #c3963f;
   --white: #ffffff;
   --shadow: 0 24px 80px rgba(16, 16, 16, 0.18);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -25,6 +26,7 @@ body {
   color: var(--ink);
   font-family: "Inter", Arial, sans-serif;
   letter-spacing: 0;
+  overflow-x: hidden;
 }
 
 a {
@@ -45,7 +47,9 @@ a {
   min-height: 78px;
   padding: 18px clamp(20px, 4vw, 56px);
   color: var(--white);
-  transition: background 200ms ease, color 200ms ease, box-shadow 200ms ease;
+  transform: translateY(0);
+  transition: background 260ms ease, color 260ms ease, box-shadow 260ms ease, transform 500ms var(--ease-out);
+  animation: headerEnter 900ms var(--ease-out) both;
 }
 
 .site-header.is-scrolled {
@@ -53,6 +57,10 @@ a {
   color: var(--ink);
   box-shadow: 0 10px 36px rgba(16, 16, 16, 0.08);
   backdrop-filter: blur(18px);
+}
+
+.site-header.is-hidden {
+  transform: translateY(-105%);
 }
 
 .brand,
@@ -91,6 +99,20 @@ footer {
   padding: 12px 18px;
   font-size: 0.88rem;
   font-weight: 800;
+  transition: background 240ms ease, color 240ms ease, transform 240ms ease;
+}
+
+.nav-cta:hover {
+  background: currentColor;
+  transform: translateY(-2px);
+}
+
+.site-header:not(.is-scrolled) .nav-cta:hover {
+  color: var(--ink);
+}
+
+.site-header.is-scrolled .nav-cta:hover {
+  color: var(--paper);
 }
 
 .hero {
@@ -101,6 +123,7 @@ footer {
   align-items: end;
   padding: 150px clamp(20px, 5vw, 72px) 64px;
   color: var(--white);
+  isolation: isolate;
 }
 
 .hero-image,
@@ -113,18 +136,48 @@ footer {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transform: scale(1.06) translate3d(0, var(--hero-shift, 0px), 0);
+  transform-origin: center;
+  will-change: transform, filter;
+  animation: heroImageEnter 1600ms var(--ease-out) both;
 }
 
 .hero-overlay {
   background:
     linear-gradient(90deg, rgba(16, 16, 16, 0.86), rgba(16, 16, 16, 0.4) 45%, rgba(16, 16, 16, 0.12)),
     linear-gradient(0deg, rgba(16, 16, 16, 0.72), transparent 50%);
+  opacity: var(--hero-overlay-opacity, 1);
+  transition: opacity 300ms ease;
 }
 
 .hero-content {
   position: relative;
   z-index: 2;
   max-width: 920px;
+  transform: translate3d(0, var(--hero-copy-shift, 0px), 0);
+  will-change: transform;
+}
+
+.hero-line {
+  opacity: 0;
+  transform: translateY(28px);
+  animation: heroTextEnter 1000ms var(--ease-out) both;
+}
+
+.hero-line:nth-child(1) {
+  animation-delay: 180ms;
+}
+
+.hero-line:nth-child(2) {
+  animation-delay: 280ms;
+}
+
+.hero-line:nth-child(3) {
+  animation-delay: 420ms;
+}
+
+.hero-line:nth-child(4) {
+  animation-delay: 540ms;
 }
 
 .eyebrow,
@@ -182,6 +235,14 @@ h2 {
   border-radius: 999px;
   padding: 15px 22px;
   font-weight: 900;
+  transition: transform 260ms var(--ease-out), box-shadow 260ms ease, background 260ms ease;
+  will-change: transform;
+}
+
+.button:hover,
+.contact-form button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(16, 16, 16, 0.22);
 }
 
 .button.primary {
@@ -206,6 +267,10 @@ h2 {
   border: 1px solid rgba(255, 255, 255, 0.32);
   box-shadow: var(--shadow);
   backdrop-filter: blur(18px);
+  opacity: 0;
+  transform: translateY(32px) scale(0.98);
+  animation: panelEnter 950ms var(--ease-out) 760ms both;
+  will-change: transform;
 }
 
 .hero-panel div {
@@ -247,6 +312,12 @@ h2 {
   font-size: 0.8rem;
   font-weight: 900;
   text-transform: uppercase;
+  transition: color 260ms ease, background 260ms ease;
+}
+
+.ticker span:hover {
+  background: var(--cream);
+  color: var(--ink);
 }
 
 .section-pad {
@@ -303,6 +374,9 @@ h2 {
   color: var(--white);
   overflow: hidden;
   position: relative;
+  transform-style: preserve-3d;
+  transition: transform 420ms var(--ease-out), box-shadow 420ms ease;
+  will-change: transform;
 }
 
 .work-card::after {
@@ -312,6 +386,17 @@ h2 {
   height: 58%;
   background: rgba(255, 255, 255, 0.14);
   transform: rotate(-15deg);
+  transition: transform 560ms var(--ease-out), opacity 420ms ease;
+  will-change: transform;
+}
+
+.work-card:hover {
+  transform: translateY(-10px) scale(1.01);
+  box-shadow: 0 26px 70px rgba(16, 16, 16, 0.2);
+}
+
+.work-card:hover::after {
+  transform: translateY(-12px) rotate(-12deg) scale(1.08);
 }
 
 .work-card.red {
@@ -368,6 +453,12 @@ h2 {
   gap: clamp(18px, 3vw, 48px);
   padding: 34px 0;
   border-bottom: 1px solid var(--line);
+  transition: padding-left 340ms var(--ease-out), background 340ms ease;
+}
+
+.service-list article:hover {
+  padding-left: 18px;
+  background: rgba(16, 16, 16, 0.035);
 }
 
 .service-list span,
@@ -413,6 +504,12 @@ h2 {
   gap: 22px;
   padding: 28px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  transition: transform 320ms var(--ease-out), border-color 320ms ease;
+}
+
+.steps li:hover {
+  transform: translateX(12px);
+  border-color: rgba(255, 255, 255, 0.34);
 }
 
 .steps p {
@@ -423,6 +520,7 @@ h2 {
   padding: clamp(72px, 9vw, 120px) clamp(20px, 10vw, 150px);
   background: var(--gold);
   color: var(--ink);
+  overflow: hidden;
 }
 
 .quote-band blockquote {
@@ -431,6 +529,8 @@ h2 {
   font-family: "Playfair Display", Georgia, serif;
   font-size: clamp(2.4rem, 6vw, 6.2rem);
   line-height: 1;
+  transform: translateX(var(--quote-shift, 0px));
+  will-change: transform;
 }
 
 .quote-band p {
@@ -470,11 +570,20 @@ h2 {
   background: rgba(255, 255, 255, 0.08);
   color: var(--white);
   font: inherit;
+  transition: border-color 220ms ease, background 220ms ease, transform 220ms ease;
 }
 
 .contact-form input::placeholder,
 .contact-form textarea::placeholder {
   color: rgba(255, 255, 255, 0.52);
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.13);
+  transform: translateY(-2px);
 }
 
 .contact-form button {
@@ -485,6 +594,7 @@ h2 {
   font: inherit;
   font-weight: 900;
   cursor: pointer;
+  transition: transform 260ms var(--ease-out), box-shadow 260ms ease, background 260ms ease;
 }
 
 footer {
@@ -499,6 +609,71 @@ footer {
 footer span:first-child {
   color: var(--white);
   font-weight: 900;
+}
+
+[data-animate],
+.work-card,
+.service-list article,
+.steps li,
+.contact-form {
+  opacity: 0;
+  transform: translateY(42px);
+  transition: opacity 900ms var(--ease-out), transform 900ms var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+[data-animate].is-visible,
+.work-card.is-visible,
+.service-list article.is-visible,
+.steps li.is-visible,
+.contact-form.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.work-card.is-visible:hover {
+  transform: translateY(-10px) scale(1.01);
+}
+
+.steps li.is-visible:hover {
+  transform: translateX(12px);
+}
+
+@keyframes headerEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroImageEnter {
+  from {
+    filter: blur(10px);
+    transform: scale(1.12) translate3d(0, 0, 0);
+  }
+  to {
+    filter: blur(0);
+    transform: scale(1.06) translate3d(0, var(--hero-shift, 0px), 0);
+  }
+}
+
+@keyframes heroTextEnter {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes panelEnter {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @media (max-width: 900px) {
@@ -584,5 +759,22 @@ footer span:first-child {
 
   .steps li {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+
+  .hero-image,
+  .hero-content,
+  .quote-band blockquote {
+    transform: none !important;
   }
 }
